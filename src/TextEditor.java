@@ -1,6 +1,9 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 
 
 public class TextEditor implements ActionListener {
@@ -60,9 +63,16 @@ public class TextEditor implements ActionListener {
         edit.add(selectAll);
         edit.add(close);
 
+       JScrollPane scrollPane= new JScrollPane(textArea,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED) ;
+       JPanel panel=new JPanel();
+
+       panel.setBorder(new EmptyBorder(5,5,5,5));
+       panel.setLayout(new BorderLayout(0,0));
+
+       panel.add(scrollPane);
+       frame.add(panel);
 
 
-        frame.add(textArea);
         frame.setJMenuBar(menuBar);
         frame.setBounds(0,0,400,400);
         frame.setVisible(true);
@@ -75,14 +85,56 @@ public class TextEditor implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()==newFile){
-
+            TextEditor newTextEditor =new TextEditor();
         }
-        if(e.getSource()==saveFile){
+        if(e.getSource()==saveFile)
+        {
+            JFileChooser fileChooser=new JFileChooser("C:");
+            fileChooser.setApproveButtonText("Save");
+            int chooseOption=fileChooser.showSaveDialog(null);
 
+            if(chooseOption==JFileChooser.APPROVE_OPTION){
+                File file =new File(fileChooser.getSelectedFile().getAbsolutePath()+".txt");
+                String filepath=file.getPath();
+                try{
+                    BufferedWriter outfile=null;
+                    outfile=new BufferedWriter(new FileWriter(file));
+                    textArea.write(outfile);
+                    outfile.close();
+
+                }catch (Exception exception){
+                    System.out.println(exception);
+
+
+                }
+            }
         }
         if(e.getSource()==openFile){
 
+            JFileChooser fileChooser=new JFileChooser("C:");
+            int chooseOption =fileChooser.showOpenDialog(null);
+
+            if(chooseOption==JFileChooser.APPROVE_OPTION){
+                File file =fileChooser.getSelectedFile();
+                String filePath=file.getPath();
+                try{
+                    BufferedReader bufferedReader=new BufferedReader((new FileReader(filePath)));
+                    String intermediate = "",output = "";
+                    while((intermediate=bufferedReader.readLine())!=null){
+                        output+=intermediate+ "\n";
+                    }
+                    textArea.setText(output);
+                    frame.setTitle(filePath);
+
+                }catch (Exception exception){
+                    System.out.println(exception);
+                }
+            }
+
         }
+
+
+
         if(e.getSource()==cut){
          textArea.cut();
         }
